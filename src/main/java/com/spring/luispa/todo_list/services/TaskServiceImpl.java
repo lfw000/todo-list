@@ -43,7 +43,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional(readOnly = true)
     public TaskReponse findById(Long id) throws ResourceNotFoundException {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + id + " not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found."));
 
         return taskMapper.toResponse(task);
     }

@@ -1,8 +1,6 @@
 package com.spring.luispa.todo_list.exceptions;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.context.MessageSource;
@@ -15,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import com.spring.luispa.todo_list.dtos.ApiErrorResponse;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -25,45 +25,79 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
+    public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
+        String errorMessage = messageSource.getMessage(
+                "error.validation",
+                null,
+                "Error in validation.",
+                request.getLocale());
 
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            String errorMsg = error.getDefaultMessage();
+            errors.put(fieldName, errorMsg);
         });
 
-        body.put("errors", errors);
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, errorMessage, errors);
     }
 
-    @ExceptionHandler({ ResourceNotFoundException.class, IllegalArgumentException.class })
-    public ResponseEntity<Object> handleResourceNotFoundException(Exception ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.NOT_FOUND.value());
-        body.put("error", ex.getMessage());
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> handleResourceNotFoundException(Exception ex, WebRequest request) {
+        String errorMessage = ex.getMessage();
 
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+        if (errorMessage == null || errorMessage.trim().isEmpty()) {
+            errorMessage = messageSource.getMessage("error.not_found",
+                    null,
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    request.getLocale());
+        }
+
+        return buildErrorResponse(HttpStatus.NOT_FOUND, errorMessage);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex,
-            WebRequest request) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.NOT_FOUND.value());
+    @ExceptionHandler({ HttpMessageNotReadableException.class, IllegalArgumentException.class })
+    public ResponseEntity<Object> handleBadRequestExceptions(Exception ex, WebRequest request) {
+        String errorMessage = ex.getMessage();
 
-        String errorMessage = messageSource.getMessage("BadRequest", null, request.getLocale());
+        // if (errorMessage != null && errorMessage.contains("java.time.LocalDateTime"))
+        // {
+        // errorMessage = messageSource.getMessage("eror.dateTime.format",
+        // null,
+        // "Invalid datetime format",
+        // request.getLocale());
+        // }
 
-        body.put("error", errorMessage);
+        if (errorMessage == null || errorMessage.trim().isEmpty()) {
+            errorMessage = messageSource.getMessage("error.bad_request",
+                    null,
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    request.getLocale());
+        }
 
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, errorMessage);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleAllUncaughtException(Exception ex, WebRequest request) {
+        String errorMessage = messageSource.getMessage("error.server",
+                null,
+                "An unexpected error ocurred.",
+                request.getLocale());
+
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+    }
+
+    private ResponseEntity<Object> buildErrorResponse(HttpStatus status, String message) {
+
+        return ResponseEntity.status(status)
+                .body(new ApiErrorResponse(status, message));
+    }
+
+    private ResponseEntity<Object> buildErrorResponse(HttpStatus status, String message, Map<String, String> errors) {
+
+        return ResponseEntity.status(status)
+                .body(new ApiErrorResponse(status, message, errors));
     }
 
 }

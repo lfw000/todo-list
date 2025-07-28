@@ -7,13 +7,15 @@ import java.lang.annotation.Target;
 
 import jakarta.validation.Constraint;
 
-@Constraint(validatedBy = TaskStatusValidator.class)
+@Constraint(validatedBy = DateTimeFormatValidator.class)
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidTaskStatus {
-    String message() default "Status not valid for a task";
+public @interface ValidDatetimeFormat {
+    String message() default "{error.dateTime.format}";
 
     Class<?>[] groups() default {};
 
     Class<?>[] payload() default {};
+
+    boolean futureOrPresent() default false;
 }
