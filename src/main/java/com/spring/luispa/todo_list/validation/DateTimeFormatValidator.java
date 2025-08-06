@@ -2,27 +2,26 @@ package com.spring.luispa.todo_list.validation;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.Locale;
-
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
+
+import com.spring.luispa.todo_list.services.MessageService;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 @Component
-public class DateTimeFormatValidator implements ConstraintValidator<ValidDatetimeFormat, String> {
+public class DateTimeFormatValidator implements ConstraintValidator<ValidDateTimeFormat, String> {
 
-    private final MessageSource messageSource;
+    private final MessageService messageService;
 
     private boolean futureOrPresent;
 
-    public DateTimeFormatValidator(MessageSource messageSource) {
-        this.messageSource = messageSource;
+    public DateTimeFormatValidator(MessageService messageService) {
+        this.messageService = messageService;
     }
 
     @Override
-    public void initialize(ValidDatetimeFormat constraintAnnotation) {
+    public void initialize(ValidDateTimeFormat constraintAnnotation) {
         this.futureOrPresent = constraintAnnotation.futureOrPresent();
     }
 
@@ -37,12 +36,10 @@ public class DateTimeFormatValidator implements ConstraintValidator<ValidDatetim
             LocalDateTime date = LocalDateTime.parse(value);
 
             if (futureOrPresent && date.isBefore(LocalDateTime.now())) {
-                System.out.println("Entra a validar el rango de la FECHA");
                 context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate(messageSource.getMessage("error.dateTime.futureOrPresent",
-                        null,
-                        "The date must be in the present or future",
-                        Locale.getDefault()))
+                context.buildConstraintViolationWithTemplate(
+                        messageService.getMessage("ValidDateTimeFormat.futureOrPresent",
+                                "ValidDateTimeFormat.default"))
                         .addConstraintViolation();
 
                 return false;
@@ -51,11 +48,9 @@ public class DateTimeFormatValidator implements ConstraintValidator<ValidDatetim
             return true;
         } catch (DateTimeParseException e) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(messageSource.getMessage(
-                    "error.dateTime.format",
-                    null,
-                    "Invalid date/time format",
-                    Locale.getDefault()))
+            context.buildConstraintViolationWithTemplate(
+                    messageService.getMessage("ValidDateTimeFormat.format",
+                            "ValidDateTimeFormat.default"))
                     .addConstraintViolation();
 
             return false;

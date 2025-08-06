@@ -6,16 +6,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
-@Constraint(validatedBy = DateTimeFormatValidator.class)
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Constraint(validatedBy = NoXSSValidator.class)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidDateTimeFormat {
-    String message() default "Invalid date";
+public @interface NoXSS {
+    String message() default "Not allowed characteres";
 
     Class<?>[] groups() default {};
 
-    Class<?>[] payload() default {};
-
-    boolean futureOrPresent() default false;
+    Class<? extends Payload>[] payload() default {};
 }

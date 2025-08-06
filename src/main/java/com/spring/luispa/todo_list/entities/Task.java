@@ -33,7 +33,7 @@ public class Task {
     private LocalDateTime dueDate;
 
     @Enumerated(EnumType.STRING)
-    private TaskStatus status = TaskStatus.PENDING;
+    private TaskStatus status = TaskStatus.IN_PROGRESS;
 
     @Column(name = "created_at", updatable = false)
     @CreatedDate

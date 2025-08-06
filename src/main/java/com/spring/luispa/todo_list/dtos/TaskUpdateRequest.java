@@ -1,21 +1,22 @@
 package com.spring.luispa.todo_list.dtos;
 
-import java.time.LocalDateTime;
+import com.spring.luispa.todo_list.validation.NoXSS;
+import com.spring.luispa.todo_list.validation.NotEmptyIfPresent;
+import com.spring.luispa.todo_list.validation.ValidDateTimeFormat;
+import com.spring.luispa.todo_list.validation.ValidTaskStatus;
 
-import com.spring.luispa.todo_list.entities.TaskStatus;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+// "PATCH" method
 public record TaskUpdateRequest(
-        @NotNull(message = "{NotNull.taskUpdateRequest.id}") Long id,
+                @NotNull(message = "{NotNull.task.id}") Long id,
 
-        @NotBlank(message = "{NotBlank.taskUpdateRequest.title}") @Size(min = 1, max = 256, message = "{Size.taskUpdateRequest.title}") String title,
+                @NotEmptyIfPresent(message = "{NotEmptyIfPresent.task.title}") String title,
 
-        @Size(max = 512, message = "{Size.taskUpdateRequest.description}") String description,
+                @Size(max = 512, message = "{Size.task.description}") @NoXSS(message = "{error.input.specialCharacters}") String description,
 
-        @FutureOrPresent(message = "{FutureOrPresent.taskUpdateRequest.dueDate}") LocalDateTime dueDate,
+                @ValidDateTimeFormat(futureOrPresent = true, message = "{error.dateTime.format}") String dueDate,
 
-        TaskStatus status) {
+                @ValidTaskStatus(message = "{ValidTaskStatus.taskUpdateRequest.status}") String status) {
 }

@@ -5,18 +5,19 @@ import com.spring.luispa.todo_list.entities.TaskStatus;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class TaskStatusValidator implements ConstraintValidator<ValidTaskStatus, TaskStatus> {
+public class TaskStatusValidator implements ConstraintValidator<ValidTaskStatus, String> {
 
     @Override
-    public boolean isValid(TaskStatus value, ConstraintValidatorContext context) {
+    public boolean isValid(String value, ConstraintValidatorContext context) {
+        // Use with @NotNull for required fields
         if (value == null) {
             return true;
         }
 
         try {
-            TaskStatus status = TaskStatus.valueOf(value.name());
+            TaskStatus.valueOf(value.toUpperCase());
 
-            return status != null;
+            return true;
         } catch (IllegalArgumentException e) {
             return false;
         }
