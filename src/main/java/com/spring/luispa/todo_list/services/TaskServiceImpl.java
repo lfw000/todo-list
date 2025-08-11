@@ -57,7 +57,8 @@ public class TaskServiceImpl implements TaskService {
     public TaskReponse findById(Long id) throws ResourceNotFoundException {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(
-                        messageService.getMessage("ResourceNotFound.task.id", "error.not_found")));
+                        messageService.getMessage("ResourceNotFound.task.id",
+                                "error.not_found")));
 
         return taskMapper.toResponse(task);
     }
@@ -81,13 +82,8 @@ public class TaskServiceImpl implements TaskService {
 
         Task taskDb = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(
-                        messageService.getMessage("ResourceNotFound.task.id", "error.not_found")));
-
-        // if (taskDb.getStatus() == TaskStatus.COMPLETED) {
-        // throw new InvalidTaskStateTransitionException(
-        // messageService
-        // .getMessage("InvalidTaskStateTransitionException.taskUpdateRequest.status.completed"));
-        // }
+                        messageService.getMessage("ResourceNotFound.task.id",
+                                "error.not_found")));
 
         if (task.status() != null) {
             validateTransition(taskDb.getStatus(), TaskStatus.valueOf(task.status()));
@@ -102,7 +98,8 @@ public class TaskServiceImpl implements TaskService {
     public void delete(Long id) throws ResourceNotFoundException {
         if (!taskRepository.existsById(id)) {
             throw new TaskNotFoundException(
-                    messageService.getMessage("ResourceNotFound.task.id", "error.not_found"));
+                    messageService.getMessage("ResourceNotFound.task.id",
+                            "error.not_found"));
         }
 
         taskRepository.deleteById(id);
@@ -117,7 +114,7 @@ public class TaskServiceImpl implements TaskService {
 
         if (!allowed.contains(newStatus)) {
             throw new InvalidTaskStateTransitionException(
-                    messageService.getMessage(" .taskUpdateRequest.status",
+                    messageService.getMessage("InvalidTaskStateTransitionException.taskUpdateRequest.status",
                             new Object[] { current.name(), newStatus.name() },
                             "InvalidTaskStateTransitionException.taskUpdateRequest.default"));
         }

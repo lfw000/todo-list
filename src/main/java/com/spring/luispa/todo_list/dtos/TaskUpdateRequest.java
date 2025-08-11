@@ -10,13 +10,13 @@ import jakarta.validation.constraints.Size;
 
 // "PATCH" method
 public record TaskUpdateRequest(
-                @NotNull(message = "{NotNull.task.id}") Long id,
+        @NotNull(message = "{NotNull.task.id}") Long id,
 
-                @NotEmptyIfPresent(message = "{NotEmptyIfPresent.task.title}") String title,
+        @NotEmptyIfPresent(message = "{NotEmptyIfPresent.task.title}") @NoXSS(message = "{error.input.specialCharacters}") String title,
 
-                @Size(max = 512, message = "{Size.task.description}") @NoXSS(message = "{error.input.specialCharacters}") String description,
+        @Size(max = 512, message = "{Size.task.description}") @NoXSS(message = "{error.input.specialCharacters}") String description,
 
-                @ValidDateTimeFormat(futureOrPresent = true, message = "{error.dateTime.format}") String dueDate,
+        @ValidDateTimeFormat(futureOrPresent = true, message = "{error.dateTime.format}") String dueDate,
 
-                @ValidTaskStatus(message = "{ValidTaskStatus.taskUpdateRequest.status}") String status) {
+        @ValidTaskStatus(message = "{ValidTaskStatus.task.status}") String status) {
 }

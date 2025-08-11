@@ -8,6 +8,7 @@ import com.spring.luispa.todo_list.dtos.TaskReponse;
 import com.spring.luispa.todo_list.dtos.TaskUpdateRequest;
 import com.spring.luispa.todo_list.services.TaskService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/tasks")
+@Tag(name = "Task", description = "Operacionas relacionadas a las tareas.")
 public class TaskController {
 
     private final TaskService taskService;

@@ -7,9 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record TaskCreateRequest(
-                @NotBlank(message = "{NotBlank.taskCreateRequest.title}") @Size(min = 1, max = 256, message = "{Size.task.title}") @NoXSS(message = "{error.input.specialCharacters}") String title,
+        @NotBlank(message = "{NotBlank.task.title}") @Size(min = 1, max = 256, message = "{Size.task.title}") @NoXSS(message = "{error.input.specialCharacters}") String title,
 
-                @Size(max = 512, message = "{Size.task.description}") @NoXSS(message = "{error.input.specialCharacters}") String description,
+        @Size(max = 512, message = "{Size.task.description}") @NoXSS(message = "{error.input.specialCharacters}") String description,
 
-                @NotBlank(message = "NotBlank.task.dueDate") @ValidDateTimeFormat(futureOrPresent = true) String dueDate) {
+        @NotBlank(message = "NotBlank.task.dueDate") @ValidDateTimeFormat(futureOrPresent = true) String dueDate) {
 }
